@@ -31,7 +31,8 @@ public class Hemocentro {
     @Column
     private String estado;
 
-    @JoinColumn(name = "id_conta")
+    @OneToOne
+    @JoinColumn(name = "conta_id")
     private Conta conta;
 
 }
