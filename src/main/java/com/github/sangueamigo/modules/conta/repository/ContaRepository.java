@@ -1,6 +1,11 @@
 package com.github.sangueamigo.modules.conta.repository;
 
+import com.github.sangueamigo.modules.conta.entity.Conta;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ContaRepository extends JpaRepository<ContaRepository,Long> {
+import java.util.Optional;
+
+public interface ContaRepository extends JpaRepository<Conta,Long> {
+    Optional<Conta> findByEmail(String email);
+
 }
