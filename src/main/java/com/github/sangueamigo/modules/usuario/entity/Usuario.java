@@ -18,8 +18,10 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    @Column(nullable = false)
+    private String nome;
+
+
 
     @Column(nullable = false, unique = true)
     private String cpf;
@@ -30,6 +32,7 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDate dataNascimento;
 
+    @OneToOne
     @JoinColumn(name = "conta_id")
     private Conta conta;
 
