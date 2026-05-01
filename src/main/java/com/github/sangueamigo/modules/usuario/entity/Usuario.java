@@ -30,6 +30,7 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDate dataNascimento;
 
+    @OneToOne
     @JoinColumn(name = "conta_id")
     private Conta conta;
 
