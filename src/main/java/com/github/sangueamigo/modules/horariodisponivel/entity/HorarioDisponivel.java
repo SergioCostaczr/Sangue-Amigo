@@ -26,7 +26,6 @@ public class HorarioDisponivel {
     @Column(nullable = false)
     private LocalDate data;
 
-
     @Column(nullable = false)
     private LocalTime hora;
 
