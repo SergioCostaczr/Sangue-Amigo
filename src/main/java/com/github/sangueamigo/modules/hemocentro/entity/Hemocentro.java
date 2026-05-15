@@ -19,6 +19,9 @@ public class Hemocentro {
     @Column(nullable = false)
     private String nome;
 
+    @Column(nullable = false, unique = true)
+    private String cnpj;
+
     @Column(nullable = false)
     private String telefone;
 
