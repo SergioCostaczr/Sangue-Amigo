@@ -1,5 +1,6 @@
 package com.github.sangueamigo.modules.agendamento.entity;
 
+import com.github.sangueamigo.modules.doacao.entity.Doacao;
 import com.github.sangueamigo.modules.hemocentro.entity.Hemocentro;
 import com.github.sangueamigo.modules.horariodisponivel.entity.HorarioDisponivel;
 import com.github.sangueamigo.modules.usuario.entity.Usuario;
@@ -47,4 +48,7 @@ public class Agendamento {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "horario_id", nullable = false)
     private HorarioDisponivel horarioDisponivel;
+
+    @OneToOne(mappedBy = "agendamento", cascade = CascadeType.ALL)
+    private Doacao doacao; // null ate validacao do Qr code
 }
