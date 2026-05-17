@@ -33,7 +33,7 @@ public class Agendamento {
     private LocalDate data;
 
     @Column(nullable = false)
-    private LocalTime horaio;
+    private LocalTime horario;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
