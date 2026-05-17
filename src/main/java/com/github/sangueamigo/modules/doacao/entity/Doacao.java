@@ -19,7 +19,7 @@ public class Doacao {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDate data;
+    private LocalDate dataDoacao;
 
     @Column(length = 500)
     private String observacoes;
