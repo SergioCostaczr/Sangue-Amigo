@@ -1,5 +1,6 @@
 package com.github.sangueamigo.modules.agendamento.entity;
 
+import com.github.sangueamigo.modules.agendamento.enums.StatusAgendamento;
 import com.github.sangueamigo.modules.doacao.entity.Doacao;
 import com.github.sangueamigo.modules.hemocentro.entity.Hemocentro;
 import com.github.sangueamigo.modules.horariodisponivel.entity.HorarioDisponivel;
@@ -32,7 +33,11 @@ public class Agendamento {
     private LocalDate data;
 
     @Column(nullable = false)
-    private LocalTime hora;
+    private LocalTime horario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusAgendamento status = StatusAgendamento.PENDENTE;
 
     @Column(unique = true)
     private String qrCodeToken;
