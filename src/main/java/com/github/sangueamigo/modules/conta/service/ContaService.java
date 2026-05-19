@@ -3,10 +3,13 @@ package com.github.sangueamigo.modules.conta.service;
 import com.github.sangueamigo.infrastructure.security.JwtService;
 import com.github.sangueamigo.modules.conta.dto.request.CadastrarHemocentroRequest;
 import com.github.sangueamigo.modules.conta.dto.request.CadastrarUsuarioRequest;
+import com.github.sangueamigo.modules.conta.dto.request.LoginRequest;
+import com.github.sangueamigo.modules.conta.dto.response.AuthResponse;
 import com.github.sangueamigo.modules.conta.entity.Conta;
 import com.github.sangueamigo.modules.conta.enums.Role;
 import com.github.sangueamigo.modules.conta.exception.CnpjJaCadastradoException;
 import com.github.sangueamigo.modules.conta.exception.CpfJaCadastradoException;
+import com.github.sangueamigo.modules.conta.exception.CredenciaisInvalidasException;
 import com.github.sangueamigo.modules.conta.exception.EmailJaCadastradoException;
 import com.github.sangueamigo.modules.conta.repository.ContaRepository;
 import com.github.sangueamigo.modules.hemocentro.entity.Hemocentro;
@@ -15,6 +18,8 @@ import com.github.sangueamigo.modules.usuario.entity.Usuario;
 import com.github.sangueamigo.modules.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +35,7 @@ public class ContaService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    // RF01 Cadastro
     @Transactional
     public void cadastrarUsuario(CadastrarUsuarioRequest request){
 
@@ -83,5 +89,24 @@ public class ContaService {
         hemocentro.setEstado(request.estado());
         hemocentro.setConta(conta);
         hemocentroRepository.save(hemocentro);
+    }
+
+    // RF02 Login
+    public AuthResponse login(LoginRequest request){
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.senha())
+            );
+        } catch (AuthenticationException e){
+            throw new CredenciaisInvalidasException();
+        }
+
+        Conta conta = contaRepository.findByEmail(request.email())
+                .orElseThrow(() -> new CredenciaisInvalidasException());
+
+        String accessToken = jwtService.gerarAccessToken(conta);
+        String refreshToken = jwtService.gerarRefreshToken(conta);
+
+        return new AuthResponse(accessToken,refreshToken,conta.getRole().name());
     }
 }
