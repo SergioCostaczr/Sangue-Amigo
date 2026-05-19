@@ -5,6 +5,7 @@ import com.github.sangueamigo.modules.conta.dto.request.CadastrarHemocentroReque
 import com.github.sangueamigo.modules.conta.dto.request.CadastrarUsuarioRequest;
 import com.github.sangueamigo.modules.conta.entity.Conta;
 import com.github.sangueamigo.modules.conta.enums.Role;
+import com.github.sangueamigo.modules.conta.exception.CnpjJaCadastradoException;
 import com.github.sangueamigo.modules.conta.exception.CpfJaCadastradoException;
 import com.github.sangueamigo.modules.conta.exception.EmailJaCadastradoException;
 import com.github.sangueamigo.modules.conta.repository.ContaRepository;
@@ -62,6 +63,10 @@ public class ContaService {
 
         if (contaRepository.findByEmail(request.email()).isPresent()) {
             throw new EmailJaCadastradoException();
+        }
+
+        if (hemocentroRepository.existsBYCnpj(request.cnpj())){
+            throw new CnpjJaCadastradoException();
         }
 
         Conta conta = new Conta();
