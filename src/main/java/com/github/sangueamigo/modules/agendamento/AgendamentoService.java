@@ -1,14 +1,15 @@
 package com.github.sangueamigo.modules.agendamento;
 
-import com.github.sangueamigo.infrastructure.exception.AgendamentoNaoEncontradoException;
-import com.github.sangueamigo.infrastructure.exception.AgendamentoNaoPertenceAoUsuarioException;
-import com.github.sangueamigo.infrastructure.exception.HorarioIndisponivelException;
-import com.github.sangueamigo.infrastructure.exception.UsuarioInaptoException;
+import com.github.sangueamigo.infrastructure.exception.*;
 import com.github.sangueamigo.modules.agendamento.dto.AgendamentoResponse;
 import com.github.sangueamigo.modules.agendamento.dto.CriarAgendamentoRequest;
+import com.github.sangueamigo.modules.agendamento.dto.ValidacaoQrCodeResponse;
+import com.github.sangueamigo.modules.agendamento.dto.ValidarQrCodeRequest;
 import com.github.sangueamigo.modules.agendamento.entity.Agendamento;
 import com.github.sangueamigo.modules.agendamento.enums.StatusAgendamento;
 import com.github.sangueamigo.modules.agendamento.repository.AgendamentoRepository;
+import com.github.sangueamigo.modules.doacao.entity.Doacao;
+import com.github.sangueamigo.modules.doacao.service.DoacaoService;
 import com.github.sangueamigo.modules.horariodisponivel.entity.HorarioDisponivel;
 import com.github.sangueamigo.modules.horariodisponivel.repository.HorarioDisponivelRepository;
 import com.github.sangueamigo.modules.usuario.entity.Usuario;
@@ -31,6 +32,7 @@ public class AgendamentoService {
     private final AgendamentoRepository agendamentoRepository;
     private final HorarioDisponivelRepository horarioRepository;
     private final UsuarioRepository usuarioRepository;
+    private final DoacaoService doacaoService;
 
 
     // RF03, RF06, RF20
@@ -101,6 +103,35 @@ public class AgendamentoService {
         devolverVaga(agendamento.getHorarioDisponivel());
     }
 
+    @Transactional
+    public ValidacaoQrCodeResponse validarQrCode(ValidarQrCodeRequest request) {
+
+        Agendamento agendamento = agendamentoRepository
+                .findByQrCodeToken(request.qrCodeToken())
+                .orElseThrow(QrCodeInvalidoException::new);
+
+        if (agendamento.getStatus() != StatusAgendamento.CONFIRMADO) {
+            throw new QrCodeInvalidoException();
+        }
+
+        if (doacaoService.jaRegistrada(agendamento.getId())) {
+            throw new DoacaoJaRegistradaException();
+        }
+
+        Doacao doacao = doacaoService.registrar(agendamento);
+
+        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
+        agendamentoRepository.save(agendamento);
+
+        Usuario usuario = agendamento.getUsuario();
+        return new ValidacaoQrCodeResponse(
+                doacao.getId(),
+                usuario.getNome(),
+                usuario.getTipoSanguineo().name(),
+                doacao.getDataDoacao()
+        );
+    }
+
     // RF04 Consultas de histórico
     public List<AgendamentoResponse> listarTodosDoUsuario(Long contaId) {
         Usuario usuario = usuarioRepository.findByContaId(contaId)
@@ -126,6 +157,18 @@ public class AgendamentoService {
                 .map(AgendamentoResponse::from)
                 .toList();
     }
+
+    // RF16/RF17 Painel do hemocentro
+    public List<AgendamentoResponse> listarPorHemocentro(Long hemocentroId, LocalDate data) {
+        return agendamentoRepository
+                .findByHemocentroIdAndDataOrderByHorario(hemocentroId, data)
+                .stream()
+                .map(AgendamentoResponse::from)
+                .toList();
+    }
+
+
+    // Metodos de validacao
 
     private void validarDisponibilidadeHorario(HorarioDisponivel horario){
         if (!horario.getDisponivel()){
