@@ -1,4 +1,4 @@
-package com.github.sangueamigo.infrastructure.exception;
+package com.github.sangueamigo.modules.agendamento.exception;
 
 public class AgendamentoNaoEncontradoException extends RuntimeException {
     public AgendamentoNaoEncontradoException(Long id) {

@@ -1,4 +1,4 @@
-package com.github.sangueamigo.infrastructure.exception;
+package com.github.sangueamigo.modules.agendamento.exception;
 
 public class DoacaoJaRegistradaException extends RuntimeException {
     public DoacaoJaRegistradaException() {
