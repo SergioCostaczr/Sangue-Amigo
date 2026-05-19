@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -98,6 +99,32 @@ public class AgendamentoService {
 
         // Devolve a vaga ao horário
         devolverVaga(agendamento.getHorarioDisponivel());
+    }
+
+    // RF04 Consultas de histórico
+    public List<AgendamentoResponse> listarTodosDoUsuario(Long contaId) {
+        Usuario usuario = usuarioRepository.findByContaId(contaId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+
+        return agendamentoRepository
+                .findByUsuarioIdOrderByDataDesc(usuario.getId())
+                .stream()
+                .map(AgendamentoResponse::from)
+                .toList();
+    }
+
+    public List<AgendamentoResponse> listarAtivosDoUsuario(Long contaId) {
+        Usuario usuario = usuarioRepository.findByContaId(contaId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+
+        return agendamentoRepository
+                .findByUsuarioIdAndStatusIn(
+                        usuario.getId(),
+                        List.of(StatusAgendamento.PENDENTE, StatusAgendamento.CONFIRMADO)
+                )
+                .stream()
+                .map(AgendamentoResponse::from)
+                .toList();
     }
 
     private void validarDisponibilidadeHorario(HorarioDisponivel horario){
