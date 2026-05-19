@@ -1,4 +1,4 @@
-package com.github.sangueamigo.modules.agendamento;
+package com.github.sangueamigo.modules.agendamento.service;
 
 import com.github.sangueamigo.modules.agendamento.dto.AgendamentoResponse;
 import com.github.sangueamigo.modules.agendamento.dto.CriarAgendamentoRequest;
