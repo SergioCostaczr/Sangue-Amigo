@@ -1,5 +1,7 @@
 package com.github.sangueamigo.modules.agendamento;
 
+import com.github.sangueamigo.infrastructure.exception.AgendamentoNaoEncontradoException;
+import com.github.sangueamigo.infrastructure.exception.AgendamentoNaoPertenceAoUsuarioException;
 import com.github.sangueamigo.infrastructure.exception.HorarioIndisponivelException;
 import com.github.sangueamigo.infrastructure.exception.UsuarioInaptoException;
 import com.github.sangueamigo.modules.agendamento.dto.AgendamentoResponse;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,8 @@ public class AgendamentoService {
     private final HorarioDisponivelRepository horarioRepository;
     private final UsuarioRepository usuarioRepository;
 
+
+    // RF03, RF06, RF20
     @Transactional
     public AgendamentoResponse criar(Long contaId, CriarAgendamentoRequest request){
         Usuario usuario = usuarioRepository.findByContaId(contaId)
@@ -53,6 +58,46 @@ public class AgendamentoService {
 
         return AgendamentoResponse.from(agendamento);
 
+    }
+
+    // RF14
+    @Transactional
+    public AgendamentoResponse confirmar(Long agendamentoId, Long contaId) {
+
+        Agendamento agendamento = buscarPorIdEValidarDono(agendamentoId, contaId);
+
+        if (agendamento.getStatus() != StatusAgendamento.PENDENTE) {
+            throw new IllegalStateException(
+                    "Apenas agendamentos PENDENTES podem ser confirmados."
+            );
+        }
+
+        agendamento.setStatus(StatusAgendamento.CONFIRMADO);
+        agendamento.setQrCodeToken(UUID.randomUUID().toString());
+
+        return AgendamentoResponse.from(agendamentoRepository.save(agendamento));
+    }
+
+    //RF05
+    @Transactional
+    public void cancelar(Long agendamentoId, Long contaId) {
+
+        Agendamento agendamento = buscarPorIdEValidarDono(agendamentoId, contaId);
+
+        if (agendamento.getStatus() == StatusAgendamento.CONCLUIDO) {
+            throw new IllegalStateException(
+                    "Agendamentos concluídos não podem ser cancelados."
+            );
+        }
+        if (agendamento.getStatus() == StatusAgendamento.CANCELADO) {
+            throw new IllegalStateException("Agendamento já cancelado.");
+        }
+
+        agendamento.setStatus(StatusAgendamento.CANCELADO);
+        agendamentoRepository.save(agendamento);
+
+        // Devolve a vaga ao horário
+        devolverVaga(agendamento.getHorarioDisponivel());
     }
 
     private void validarDisponibilidadeHorario(HorarioDisponivel horario){
@@ -93,5 +138,22 @@ public class AgendamentoService {
         }
     }
 
+    private Agendamento buscarPorIdEValidarDono(Long agendamentoId, Long contaId) {
+        Agendamento agendamento = agendamentoRepository.findById(agendamentoId)
+                .orElseThrow(() -> new AgendamentoNaoEncontradoException(agendamentoId));
+
+        if (!agendamento.getUsuario().getConta().getId().equals(contaId)) {
+            throw new AgendamentoNaoPertenceAoUsuarioException();
+        }
+
+        return agendamento;
+    }
+
+    private void devolverVaga(HorarioDisponivel horario) {
+        if (!horario.getDisponivel()) {
+            horario.setDisponivel(true);
+            horarioRepository.save(horario);
+        }
+    }
 
 }
