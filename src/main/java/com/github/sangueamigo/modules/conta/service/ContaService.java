@@ -123,7 +123,7 @@ public class ContaService {
     // RF21 Recuperação de senha: passo 1
     public void solicitarRecuperacaoSenha(RecuperarSenhaRequest request){
         contaRepository.findByEmail(request.email()).ifPresent(conta -> {
-            String resetToken = jwtService.generateResetToken(conta);
+            String resetToken = jwtService.gerarResetToken(conta);
             // notificacao service envia email com token
         });
     }
@@ -136,7 +136,7 @@ public class ContaService {
         Conta conta = contaRepository.findByEmail(email)
                 .orElseThrow(TokenInvalidoException::new);
 
-        if (!jwtService.isResetTokenValid(request.token(), conta)) {
+        if (!jwtService.isResetTokenValido(request.token(), conta)) {
             throw new TokenInvalidoException();
         }
 

@@ -38,7 +38,7 @@ public class JwtService {
     }
 
     // Token de curta duração exclusivo para reset de senha
-    public String generateResetToken(UserDetails userDetails) {
+    public String gerarResetToken(UserDetails userDetails) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .claim("type", "reset")          // claim para distinguir do access token
@@ -68,7 +68,7 @@ public class JwtService {
         return extrairExpiracao(token).before(new Date());
     }
 
-    public boolean isResetTokenValid(String token, UserDetails userDetails) {
+    public boolean isResetTokenValido(String token, UserDetails userDetails) {
         final String username = extrairEmail(token);
         final String type = extrairClaim(token, claims -> claims.get("type", String.class));
 
