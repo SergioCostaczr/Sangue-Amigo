@@ -66,7 +66,7 @@ public class ContaService {
             throw new EmailJaCadastradoException();
         }
 
-        if (hemocentroRepository.existsBYCnpj(request.cnpj())){
+        if (hemocentroRepository.existsByCnpj(request.cnpj())){
             throw new CnpjJaCadastradoException();
         }
 
