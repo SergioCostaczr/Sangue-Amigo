@@ -1,9 +1,9 @@
-package com.github.sangueamigo.modules.agendamento;
+package com.github.sangueamigo.modules.agendamento.service;
 
-import com.github.sangueamigo.modules.agendamento.dto.AgendamentoResponse;
-import com.github.sangueamigo.modules.agendamento.dto.CriarAgendamentoRequest;
-import com.github.sangueamigo.modules.agendamento.dto.ValidacaoQrCodeResponse;
-import com.github.sangueamigo.modules.agendamento.dto.ValidarQrCodeRequest;
+import com.github.sangueamigo.modules.agendamento.dto.response.AgendamentoResponse;
+import com.github.sangueamigo.modules.agendamento.dto.request.CriarAgendamentoRequest;
+import com.github.sangueamigo.modules.agendamento.dto.response.ValidacaoQrCodeResponse;
+import com.github.sangueamigo.modules.agendamento.dto.request.ValidarQrCodeRequest;
 import com.github.sangueamigo.modules.agendamento.entity.Agendamento;
 import com.github.sangueamigo.modules.agendamento.enums.StatusAgendamento;
 import com.github.sangueamigo.modules.agendamento.exception.*;

@@ -25,7 +25,7 @@ public class JwtService {
     @Value("${jwt.refresh-expiration}")
     private Long refreshExpiration;
 
-
+    // geracao de tokens
     public String gerarAccessToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", userDetails.getAuthorities()
@@ -35,6 +35,17 @@ public class JwtService {
 
     public String gerarRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails.getUsername(), refreshExpiration);
+    }
+
+    // Token de curta duração exclusivo para reset de senha
+    public String generateResetToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claim("type", "reset")          // claim para distinguir do access token
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15min
+                .signWith(getSigningKey())
+                .compact();
     }
 
     private String buildToken(Map<String, Object> claims, String subject, Long expiracao) {
@@ -47,7 +58,7 @@ public class JwtService {
                 .compact();
     }
 
-
+    // validacoes
     public boolean isTokenValido(String token, UserDetails userDetails) {
         final String email = extrairEmail(token);
         return email.equals(userDetails.getUsername()) && !isTokenExpirado(token);
@@ -57,6 +68,16 @@ public class JwtService {
         return extrairExpiracao(token).before(new Date());
     }
 
+    public boolean isResetTokenValid(String token, UserDetails userDetails) {
+        final String username = extrairEmail(token);
+        final String type = extrairClaim(token, claims -> claims.get("type", String.class));
+
+        return username.equals(userDetails.getUsername())
+                && "reset".equals(type)
+                && !isTokenExpirado(token);
+    }
+
+    // Extracoes de informacoes do token
     public String extrairEmail(String token) {
         return extrairClaim(token, claims -> claims.getSubject());
     }
@@ -82,6 +103,7 @@ public class JwtService {
                 .getPayload();
     }
 
+    // key
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
