@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface HemocentroRepository extends JpaRepository<Hemocentro,Long> {
     Optional<Hemocentro> findByContaId(Long contaId);
 
-    boolean existsBYCnpj(String cnpj);
+    boolean existsByCnpj(String cnpj);
 
 }
