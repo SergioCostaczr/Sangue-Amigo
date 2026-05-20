@@ -1,10 +1,7 @@
 package com.github.sangueamigo.modules.conta.service;
 
 import com.github.sangueamigo.infrastructure.security.JwtService;
-import com.github.sangueamigo.modules.conta.dto.request.CadastrarHemocentroRequest;
-import com.github.sangueamigo.modules.conta.dto.request.CadastrarUsuarioRequest;
-import com.github.sangueamigo.modules.conta.dto.request.LoginRequest;
-import com.github.sangueamigo.modules.conta.dto.request.RefreshTokenRequest;
+import com.github.sangueamigo.modules.conta.dto.request.*;
 import com.github.sangueamigo.modules.conta.dto.response.AuthResponse;
 import com.github.sangueamigo.modules.conta.entity.Conta;
 import com.github.sangueamigo.modules.conta.enums.Role;
@@ -118,10 +115,15 @@ public class ContaService {
         if (!jwtService.isTokenValido(request.refreshToken(), conta)) {
             throw new TokenInvalidoException();
         }
-
         String novoAccessToken = jwtService.gerarAccessToken(conta);
-
         return new AuthResponse(novoAccessToken, request.refreshToken(), conta.getRole().name());
+    }
+
+    public void solicitarRecuperacaoSenha(RecuperarSenhaRequest request){
+        contaRepository.findByEmail(request.email()).ifPresent(conta -> {
+            String resetToken = jwtService.generateResetToken(conta);
+            // notificacao service envia email com token
+        });
     }
 
 }
