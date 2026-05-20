@@ -5,6 +5,7 @@ import com.github.sangueamigo.modules.conta.dto.request.*;
 import com.github.sangueamigo.modules.conta.dto.response.AuthResponse;
 import com.github.sangueamigo.modules.conta.entity.Conta;
 import com.github.sangueamigo.modules.conta.enums.Role;
+import com.github.sangueamigo.modules.conta.event.SenhaRecuperacaoSolicitadaEvent;
 import com.github.sangueamigo.modules.conta.event.UsuarioCadastradoEvent;
 import com.github.sangueamigo.modules.conta.exception.*;
 import com.github.sangueamigo.modules.conta.repository.ContaRepository;
@@ -132,6 +133,8 @@ public class ContaService {
         contaRepository.findByEmail(request.email()).ifPresent(conta -> {
             String resetToken = jwtService.gerarResetToken(conta);
             // notificacao service envia email com token
+            eventPublisher.publishEvent(
+                    new SenhaRecuperacaoSolicitadaEvent(conta.getEmail(),resetToken));
         });
     }
 
