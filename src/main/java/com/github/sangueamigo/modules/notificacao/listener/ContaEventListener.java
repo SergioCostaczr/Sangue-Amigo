@@ -1,5 +1,6 @@
 package com.github.sangueamigo.modules.notificacao.listener;
 
+import com.github.sangueamigo.modules.conta.event.SenhaRecuperacaoSolicitadaEvent;
 import com.github.sangueamigo.modules.conta.event.UsuarioCadastradoEvent;
 import com.github.sangueamigo.modules.notificacao.service.NotificacaoService;
 import lombok.RequiredArgsConstructor;
@@ -15,5 +16,10 @@ public class ContaEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onUsuarioCadastro(UsuarioCadastradoEvent event){
         notificacaoService.enviarBoasVindas(event.email(),event.nome());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onSenhaRecuperacaoSolicitada(SenhaRecuperacaoSolicitadaEvent event) {
+        notificacaoService.enviarRecuperacaoSenha(event.email(), event.resetToken());
     }
 }
