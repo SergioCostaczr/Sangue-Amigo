@@ -9,7 +9,7 @@ import java.util.List;
 public interface HorarioDisponivelRepository extends JpaRepository<HorarioDisponivel, Long> {
 
     // RF 03
-    List<HorarioDisponivel> findByHomocentroIdAndDataAndDisponivelTrue(Long homocentroId, LocalDate data);
+    List<HorarioDisponivel> findByHemocentroIdAndDataAndDisponivelTrue(Long homocentroId, LocalDate data);
 
     // Listar todos os horários de um hemocentro num período (painel admin)
     List<HorarioDisponivel> findByHemocentroIdAndDataBetween(
