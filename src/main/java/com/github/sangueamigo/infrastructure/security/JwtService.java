@@ -37,6 +37,17 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails.getUsername(), refreshExpiration);
     }
 
+    // Token de curta duração exclusivo para reset de senha
+    public String generateResetToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claim("type", "reset")          // claim para distinguir do access token
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15min
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     private String buildToken(Map<String, Object> claims, String subject, Long expiracao) {
         return Jwts.builder()
                 .claims(claims)
