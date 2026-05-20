@@ -4,13 +4,11 @@ import com.github.sangueamigo.infrastructure.security.JwtService;
 import com.github.sangueamigo.modules.conta.dto.request.CadastrarHemocentroRequest;
 import com.github.sangueamigo.modules.conta.dto.request.CadastrarUsuarioRequest;
 import com.github.sangueamigo.modules.conta.dto.request.LoginRequest;
+import com.github.sangueamigo.modules.conta.dto.request.RefreshTokenRequest;
 import com.github.sangueamigo.modules.conta.dto.response.AuthResponse;
 import com.github.sangueamigo.modules.conta.entity.Conta;
 import com.github.sangueamigo.modules.conta.enums.Role;
-import com.github.sangueamigo.modules.conta.exception.CnpjJaCadastradoException;
-import com.github.sangueamigo.modules.conta.exception.CpfJaCadastradoException;
-import com.github.sangueamigo.modules.conta.exception.CredenciaisInvalidasException;
-import com.github.sangueamigo.modules.conta.exception.EmailJaCadastradoException;
+import com.github.sangueamigo.modules.conta.exception.*;
 import com.github.sangueamigo.modules.conta.repository.ContaRepository;
 import com.github.sangueamigo.modules.hemocentro.entity.Hemocentro;
 import com.github.sangueamigo.modules.hemocentro.repository.HemocentroRepository;
@@ -109,4 +107,21 @@ public class ContaService {
 
         return new AuthResponse(accessToken,refreshToken,conta.getRole().name());
     }
+
+    // Refresh token
+    public AuthResponse refresh(RefreshTokenRequest request) {
+        String email = jwtService.extrairEmail(request.refreshToken());
+
+        Conta conta = contaRepository.findByEmail(email)
+                .orElseThrow(TokenInvalidoException::new);
+
+        if (!jwtService.isTokenValido(request.refreshToken(), conta)) {
+            throw new TokenInvalidoException();
+        }
+
+        String novoAccessToken = jwtService.gerarAccessToken(conta);
+
+        return new AuthResponse(novoAccessToken, request.refreshToken(), conta.getRole().name());
+    }
+
 }
