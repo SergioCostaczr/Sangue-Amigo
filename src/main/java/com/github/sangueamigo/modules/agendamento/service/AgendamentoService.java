@@ -6,6 +6,9 @@ import com.github.sangueamigo.modules.agendamento.dto.response.ValidacaoQrCodeRe
 import com.github.sangueamigo.modules.agendamento.dto.request.ValidarQrCodeRequest;
 import com.github.sangueamigo.modules.agendamento.entity.Agendamento;
 import com.github.sangueamigo.modules.agendamento.enums.StatusAgendamento;
+import com.github.sangueamigo.modules.agendamento.event.AgendamentoCanceladoEvent;
+import com.github.sangueamigo.modules.agendamento.event.AgendamentoConfirmadoEvent;
+import com.github.sangueamigo.modules.agendamento.event.DoacaoRegistradaEvent;
 import com.github.sangueamigo.modules.agendamento.exception.*;
 import com.github.sangueamigo.modules.agendamento.repository.AgendamentoRepository;
 import com.github.sangueamigo.modules.doacao.entity.Doacao;
@@ -17,6 +20,7 @@ import com.github.sangueamigo.modules.usuario.enums.Sexo;
 import com.github.sangueamigo.modules.usuario.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +37,7 @@ public class AgendamentoService {
     private final HorarioDisponivelRepository horarioRepository;
     private final UsuarioRepository usuarioRepository;
     private final DoacaoService doacaoService;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     // RF03, RF06, RF20
@@ -78,7 +83,17 @@ public class AgendamentoService {
         agendamento.setStatus(StatusAgendamento.CONFIRMADO);
         agendamento.setQrCodeToken(UUID.randomUUID().toString());
 
-        return AgendamentoResponse.from(agendamentoRepository.save(agendamento));
+        Agendamento salvo = agendamentoRepository.save(agendamento);
+        eventPublisher.publishEvent(new AgendamentoConfirmadoEvent(
+                salvo.getUsuario().getConta().getEmail(),
+                salvo.getUsuario().getNome(),
+                salvo.getHemocentro().getNome(),
+                salvo.getData(),
+                salvo.getHorario(),
+                salvo.getQrCodeToken()
+        ));
+
+        return AgendamentoResponse.from(salvo);
     }
 
     //RF05
@@ -101,6 +116,13 @@ public class AgendamentoService {
 
         // Devolve a vaga ao horário
         devolverVaga(agendamento.getHorarioDisponivel());
+        eventPublisher.publishEvent(new AgendamentoCanceladoEvent(
+                agendamento.getUsuario().getConta().getEmail(),
+                agendamento.getUsuario().getNome(),
+                agendamento.getHemocentro().getNome(),
+                agendamento.getData(),
+                agendamento.getHorario()
+        ));
     }
 
     @Transactional
@@ -124,6 +146,13 @@ public class AgendamentoService {
         agendamentoRepository.save(agendamento);
 
         Usuario usuario = agendamento.getUsuario();
+        eventPublisher.publishEvent(new DoacaoRegistradaEvent(
+                usuario.getConta().getEmail(),
+                usuario.getNome(),
+                agendamento.getHemocentro().getNome(),
+                doacao.getDataDoacao()
+        ));
+
         return new ValidacaoQrCodeResponse(
                 doacao.getId(),
                 usuario.getNome(),
@@ -165,6 +194,10 @@ public class AgendamentoService {
                 .stream()
                 .map(AgendamentoResponse::from)
                 .toList();
+    }
+
+    public boolean temAgendamentosAtivosNoHorario(Long horarioId) {
+        return agendamentoRepository.countAgendamentosAtivosNoHorario(horarioId) > 0;
     }
 
 
