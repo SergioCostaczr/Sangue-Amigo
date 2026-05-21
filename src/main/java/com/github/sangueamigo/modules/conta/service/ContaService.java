@@ -5,6 +5,8 @@ import com.github.sangueamigo.modules.conta.dto.request.*;
 import com.github.sangueamigo.modules.conta.dto.response.AuthResponse;
 import com.github.sangueamigo.modules.conta.entity.Conta;
 import com.github.sangueamigo.modules.conta.enums.Role;
+import com.github.sangueamigo.modules.conta.event.SenhaRecuperacaoSolicitadaEvent;
+import com.github.sangueamigo.modules.conta.event.UsuarioCadastradoEvent;
 import com.github.sangueamigo.modules.conta.exception.*;
 import com.github.sangueamigo.modules.conta.repository.ContaRepository;
 import com.github.sangueamigo.modules.hemocentro.entity.Hemocentro;
@@ -12,6 +14,7 @@ import com.github.sangueamigo.modules.hemocentro.repository.HemocentroRepository
 import com.github.sangueamigo.modules.usuario.entity.Usuario;
 import com.github.sangueamigo.modules.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -29,6 +32,7 @@ public class ContaService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     // RF01 Cadastro
     @Transactional
@@ -57,6 +61,10 @@ public class ContaService {
         usuario.setSexo(request.sexo());
         usuario.setConta(conta);
         usuarioRepository.save(usuario);
+
+        eventPublisher.publishEvent(
+                new UsuarioCadastradoEvent(conta.getEmail(),usuario.getNome())
+        );
     }
 
     @Transactional
@@ -125,6 +133,8 @@ public class ContaService {
         contaRepository.findByEmail(request.email()).ifPresent(conta -> {
             String resetToken = jwtService.gerarResetToken(conta);
             // notificacao service envia email com token
+            eventPublisher.publishEvent(
+                    new SenhaRecuperacaoSolicitadaEvent(conta.getEmail(),resetToken));
         });
     }
 
