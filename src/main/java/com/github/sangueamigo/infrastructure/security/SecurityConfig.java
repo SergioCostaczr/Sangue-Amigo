@@ -40,6 +40,7 @@ public class SecurityConfig {
                                     "/v3/api-docs/**"
                                     ).permitAll();
                             auth.requestMatchers(HttpMethod.GET, "/hemocentros").permitAll();
+                            auth.requestMatchers(HttpMethod.GET, "/campanhas").permitAll();
                             auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
