@@ -53,6 +53,11 @@ public class CampanhaService {
         campanha.setStatus(statusInicial(request.dataInicio()));
 
         Campanha salva = campanhaRepository.save(campanha);
+
+        if (salva.getUrgencia() == UrgenciaCampanha.CRITICA){
+            publicarUrgenciaCritica(salva);
+        }
+
         return CampanhaResponse.from(salva);
     }
 
