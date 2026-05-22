@@ -29,9 +29,14 @@ public class SecurityConfig {
                 .sessionManagement(s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                             auth.requestMatchers(
-                                            "/auth/**",
-                                            "/seagger-ui/**",
-                                            "/v3/api-docs/**"
+                                    "/auth/cadastro-usuario",
+                                    "/auth/cadastro-hemocentro",
+                                    "/auth/login",
+                                    "/auth/refresh",
+                                    "/auth/recuperar-senha",
+                                    "/auth/redefinir-senha",
+                                    "/seagger-ui/**",
+                                    "/v3/api-docs/**"
                                     ).permitAll();
                             auth.anyRequest().authenticated();
                 })
