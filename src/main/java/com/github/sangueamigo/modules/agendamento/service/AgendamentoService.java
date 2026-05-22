@@ -202,7 +202,6 @@ public class AgendamentoService {
 
 
     // Metodos de validacao
-
     private void validarDisponibilidadeHorario(HorarioDisponivel horario){
         if (!horario.getDisponivel()){
             throw new HorarioIndisponivelException();
