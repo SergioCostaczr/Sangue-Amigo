@@ -200,6 +200,15 @@ public class AgendamentoService {
         return agendamentoRepository.countAgendamentosAtivosNoHorario(horarioId) > 0;
     }
 
+    public String buscarQrCodeToken(Long agendamentoId, Long contaId) {
+        Agendamento agendamento = buscarPorIdEValidarDono(agendamentoId, contaId);
+
+        if (agendamento.getQrCodeToken() == null) {
+            throw new IllegalStateException("Agendamento ainda não foi confirmado.");
+        }
+
+        return agendamento.getQrCodeToken();
+    }
 
     // Metodos de validacao
     private void validarDisponibilidadeHorario(HorarioDisponivel horario){
