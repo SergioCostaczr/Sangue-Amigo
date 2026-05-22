@@ -28,6 +28,11 @@ spring:
           auth: true
           starttls:
             enable: true
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 5
 
 server:
   port: 8080
