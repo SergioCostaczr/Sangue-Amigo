@@ -73,6 +73,17 @@ public class HemocentroController {
         return ResponseEntity.ok(hemocentroService.listarHorarios(conta.getId(), inicio, fim));
     }
 
+    @GetMapping("/{id}/horarios")
+    @PreAuthorize("hasRole('ROLE_USUARIO')")
+    public ResponseEntity<List<HorarioDisponivelResponse>> listarHorariosDisponiveis(
+            @PathVariable Long id,
+            @RequestParam LocalDate data
+    ) {
+        return ResponseEntity.ok(
+                hemocentroService.listarHorariosDisponiveisPorData(id, data)
+        );
+    }
+
     // Atualizar horário
     @PutMapping("/horarios/{id}")
     @PreAuthorize("hasRole('ROLE_HEMOCENTRO')")

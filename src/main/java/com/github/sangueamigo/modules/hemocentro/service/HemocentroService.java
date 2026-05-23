@@ -108,6 +108,14 @@ public class HemocentroService {
                 .toList();
     }
 
+    public List<HorarioDisponivelResponse> listarHorariosDisponiveisPorData(Long hemocentroId, LocalDate data) {
+        return horarioDisponivelRepository
+                .findByHemocentroIdAndDataAndDisponivelTrue(hemocentroId, data)
+                .stream()
+                .map(HorarioDisponivelResponse::from)
+                .toList();
+    }
+
     private Hemocentro buscarHemocentroPorContaId(Long contaId) {
         return hemocentroRepository.findByContaId(contaId)
                 .orElseThrow(HemocentroNaoEncontradoException::new);
