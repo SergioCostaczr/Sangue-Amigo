@@ -101,6 +101,21 @@ public class HemocentroService {
         return buscarHemocentroPorContaId(contaId);
     }
 
+    public List<HemocentroResponse> listarTodos() {
+        return hemocentroRepository.findAll()
+                .stream()
+                .map(HemocentroResponse::from)
+                .toList();
+    }
+
+    public List<HorarioDisponivelResponse> listarHorariosDisponiveisPorData(Long hemocentroId, LocalDate data) {
+        return horarioDisponivelRepository
+                .findByHemocentroIdAndDataAndDisponivelTrue(hemocentroId, data)
+                .stream()
+                .map(HorarioDisponivelResponse::from)
+                .toList();
+    }
+
     private Hemocentro buscarHemocentroPorContaId(Long contaId) {
         return hemocentroRepository.findByContaId(contaId)
                 .orElseThrow(HemocentroNaoEncontradoException::new);
