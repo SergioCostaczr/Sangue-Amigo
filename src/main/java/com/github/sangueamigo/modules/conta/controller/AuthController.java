@@ -20,7 +20,7 @@ public class AuthController {
 
 
     // RF01 Cadastro de usuário
-    @PostMapping("/cadastrar-usuario")
+    @PostMapping("/cadastro-usuario")
     public ResponseEntity<Void> cadastrarUsuario(
             @RequestBody @Valid CadastrarUsuarioRequest request
     ) {
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     // RF01 Cadastro de hemocentro
-    @PostMapping("/cadastrar-hemocentro")
+    @PostMapping("/cadastro-hemocentro")
     public ResponseEntity<Void> cadastrarHemocentro(
             @RequestBody @Valid CadastrarHemocentroRequest request
     ) {
