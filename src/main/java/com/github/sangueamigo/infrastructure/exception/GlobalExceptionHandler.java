@@ -1,5 +1,6 @@
 package com.github.sangueamigo.infrastructure.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.github.sangueamigo.modules.agendamento.exception.*;
 import com.github.sangueamigo.modules.campanha.exception.CampanhaNaoEncontradaException;
 import com.github.sangueamigo.modules.campanha.exception.CampanhaNaoPertenceAoHemocentroException;
@@ -10,14 +11,44 @@ import com.github.sangueamigo.modules.usuario.exception.UsuarioNaoEncontradoExce
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // Adicionar no GlobalExceptionHandler
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErroResponse> handleDeserializacao(HttpMessageNotReadableException ex) {
+        String mensagem = "Valor inválido no corpo da requisição.";
+
+        Throwable causa = ex.getCause();
+        if (causa instanceof InvalidFormatException invalidFormat) {
+            String campo = invalidFormat.getPath().isEmpty()
+                    ? "desconhecido"
+                    : invalidFormat.getPath().get(0).getFieldName();
+
+            String valorInformado = String.valueOf(invalidFormat.getValue());
+
+            if (invalidFormat.getTargetType() != null && invalidFormat.getTargetType().isEnum()) {
+                String valoresValidos = Arrays.stream(invalidFormat.getTargetType().getEnumConstants())
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", "));
+
+                mensagem = "Valor '" + valorInformado + "' inválido para o campo '" + campo +
+                        "'. Valores aceitos: " + valoresValidos;
+            }
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErroResponse.of(HttpStatus.BAD_REQUEST, mensagem));
+    }
 
     // Validação de campos (@Valid / @Validated)
     @ExceptionHandler(MethodArgumentNotValidException.class)
