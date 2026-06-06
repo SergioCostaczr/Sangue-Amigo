@@ -86,6 +86,7 @@ public class ContaService {
 
         Hemocentro hemocentro = new Hemocentro();
         hemocentro.setNome(request.nome());
+        hemocentro.setCnpj(request.cnpj());
         hemocentro.setTelefone(request.telefone());
         hemocentro.setEndereco(request.endereco());
         hemocentro.setCidade(request.cidade());
