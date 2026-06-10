@@ -10,6 +10,10 @@ import { LoginPage } from "@/pages/LoginPage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { RecuperarSenhaPage } from "@/pages/RecuperarSenhaPage";
 import { RedefinirSenhaPage } from "@/pages/RedefinirSenhaPage";
+import { AgendamentosUsuarioPage } from "@/pages/usuario/AgendamentosUsuarioPage";
+import { AgendarDoacaoPage } from "@/pages/usuario/AgendarDoacaoPage";
+import { DoacoesUsuarioPage } from "@/pages/usuario/DoacoesUsuarioPage";
+import { PerfilUsuarioPage } from "@/pages/usuario/PerfilUsuarioPage";
 
 function App() {
   return (
@@ -29,10 +33,10 @@ function App() {
       <Route element={<ProtectedRoute allowedRole="ROLE_USUARIO" />}>
         <Route path="usuario" element={<DashboardLayout mode="usuario" />}>
           <Route index element={<Navigate to="agendamentos" replace />} />
-          <Route path="agendamentos" element={<PlaceholderPage title="Meus agendamentos" description="Acompanhe seus agendamentos ativos e anteriores." />} />
-          <Route path="agendar" element={<PlaceholderPage title="Agendar doacao" description="Escolha um hemocentro, uma data e um horario." />} />
-          <Route path="doacoes" element={<PlaceholderPage title="Historico de doacoes" description="Consulte as doacoes registradas em sua conta." />} />
-          <Route path="perfil" element={<PlaceholderPage title="Meu perfil" description="Mantenha seus dados pessoais atualizados." />} />
+          <Route path="agendamentos" element={<AgendamentosUsuarioPage />} />
+          <Route path="agendar" element={<AgendarDoacaoPage />} />
+          <Route path="doacoes" element={<DoacoesUsuarioPage />} />
+          <Route path="perfil" element={<PerfilUsuarioPage />} />
         </Route>
       </Route>
 
