@@ -2,22 +2,28 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute, PublicOnlyRoute } from "@/features/auth/ProtectedRoute";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { PublicLayout } from "@/layouts/PublicLayout";
+import { CadastroPage } from "@/pages/CadastroPage";
+import { CampanhasPage } from "@/pages/CampanhasPage";
 import { HomePage } from "@/pages/HomePage";
+import { HemocentrosPage } from "@/pages/HemocentrosPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
+import { RecuperarSenhaPage } from "@/pages/RecuperarSenhaPage";
+import { RedefinirSenhaPage } from "@/pages/RedefinirSenhaPage";
 
 function App() {
   return (
     <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="hemocentros" element={<PlaceholderPage title="Hemocentros" description="Consulte unidades e disponibilidade para doacao." />} />
-        <Route path="campanhas" element={<PlaceholderPage title="Campanhas" description="Acompanhe campanhas de doacao em andamento." />} />
+        <Route path="hemocentros" element={<HemocentrosPage />} />
+        <Route path="campanhas" element={<CampanhasPage />} />
         <Route element={<PublicOnlyRoute />}>
           <Route path="login" element={<LoginPage />} />
-          <Route path="cadastro" element={<PlaceholderPage title="Criar conta" description="Escolha o tipo de conta para iniciar." compact />} />
+          <Route path="cadastro" element={<CadastroPage />} />
         </Route>
-        <Route path="recuperar-senha" element={<PlaceholderPage title="Recuperar senha" description="Solicite um link para definir uma nova senha." compact />} />
+        <Route path="recuperar-senha" element={<RecuperarSenhaPage />} />
+        <Route path="redefinir-senha" element={<RedefinirSenhaPage />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRole="ROLE_USUARIO" />}>
