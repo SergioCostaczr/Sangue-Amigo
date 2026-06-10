@@ -9,8 +9,9 @@ import {
   UserRound,
   type LucideIcon,
 } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { AppLogo } from "@/components/AppLogo";
+import { useAuth } from "@/features/auth/use-auth";
 import { cn } from "@/lib/utils";
 
 interface NavigationItem {
@@ -37,12 +38,27 @@ const hemocentroItems: NavigationItem[] = [
 
 export function DashboardLayout({ mode }: { mode: "usuario" | "hemocentro" }) {
   const items = mode === "usuario" ? usuarioItems : hemocentroItems;
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-background lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="border-b border-border bg-card lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-b-0">
-        <div className="flex h-16 items-center px-4 lg:px-5">
+        <div className="flex h-16 items-center justify-between px-4 lg:px-5">
           <AppLogo />
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden"
+            aria-label="Sair"
+          >
+            <LogOut className="size-5" />
+          </button>
         </div>
 
         <nav className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-col lg:overflow-visible">
@@ -67,6 +83,7 @@ export function DashboardLayout({ mode }: { mode: "usuario" | "hemocentro" }) {
 
         <button
           type="button"
+          onClick={handleLogout}
           className="mx-3 mt-2 hidden w-[calc(100%-1.5rem)] items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground lg:flex"
         >
           <LogOut className="size-4" />

@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { AppLogo } from "@/components/AppLogo";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/auth/use-auth";
+import { roleHome } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -13,6 +15,7 @@ const links = [
 
 export function PublicLayout() {
   const [open, setOpen] = useState(false);
+  const { authenticated, role } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,8 +42,14 @@ export function PublicLayout() {
           </nav>
 
           <div className="hidden items-center gap-2 md:flex">
-            <Link to="/login"><Button variant="ghost"><LogIn className="size-4" /> Entrar</Button></Link>
-            <Link to="/cadastro"><Button><UserRoundPlus className="size-4" /> Criar conta</Button></Link>
+            {authenticated ? (
+              <Link to={roleHome(role)}><Button>Minha area</Button></Link>
+            ) : (
+              <>
+                <Link to="/login"><Button variant="ghost"><LogIn className="size-4" /> Entrar</Button></Link>
+                <Link to="/cadastro"><Button><UserRoundPlus className="size-4" /> Criar conta</Button></Link>
+              </>
+            )}
           </div>
 
           <button
@@ -67,12 +76,20 @@ export function PublicLayout() {
                   {link.label}
                 </NavLink>
               ))}
-              <NavLink to="/login" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted">
-                Entrar
-              </NavLink>
-              <NavLink to="/cadastro" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-primary">
-                Criar conta
-              </NavLink>
+              {authenticated ? (
+                <NavLink to={roleHome(role)} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-primary">
+                  Minha area
+                </NavLink>
+              ) : (
+                <>
+                  <NavLink to="/login" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted">
+                    Entrar
+                  </NavLink>
+                  <NavLink to="/cadastro" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-primary">
+                    Criar conta
+                  </NavLink>
+                </>
+              )}
             </nav>
           </div>
         )}

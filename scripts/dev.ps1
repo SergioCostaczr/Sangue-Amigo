@@ -25,9 +25,11 @@ if ($backend.HasExited) {
 Write-Host "Backend iniciado. Log: backend/target/dev-backend.log"
 
 try {
-    npm --prefix $frontendPath run dev
+    Push-Location $frontendPath
+    npm run dev
 }
 finally {
+    Pop-Location
     if (-not $backend.HasExited) {
         taskkill /PID $backend.Id /T /F | Out-Null
     }

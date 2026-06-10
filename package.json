@@ -5,9 +5,9 @@
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1",
     "backend:dev": "cd backend && mvnw.cmd spring-boot:run",
     "backend:test": "cd backend && mvnw.cmd test",
-    "frontend:dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend run build",
-    "lint": "npm --prefix frontend run lint",
-    "typecheck": "npm --prefix frontend run typecheck"
+    "frontend:dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "lint": "cd frontend && npm run lint",
+    "typecheck": "cd frontend && npm run typecheck"
   }
 }
