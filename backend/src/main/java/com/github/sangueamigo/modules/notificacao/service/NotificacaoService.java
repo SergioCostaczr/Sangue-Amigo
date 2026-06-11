@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,6 +26,9 @@ public class NotificacaoService {
     @Value("${app.notifications.enabled:true}")
     private boolean notificacoesHabilitadas;
 
+    @Value("${app.frontend.base-url}")
+    private String frontendBaseUrl;
+
     public void enviarBoasVindas(String email, String nome){
         enviar(
                 email,
@@ -35,7 +39,12 @@ public class NotificacaoService {
     }
 
     public void enviarRecuperacaoSenha(String email, String resetToken) {
-        String link = "https://sangueamigo.com/redefinir-senha?token=" + resetToken;
+        String link = UriComponentsBuilder
+                .fromUriString(frontendBaseUrl.replaceFirst("/+$", ""))
+                .path("/redefinir-senha")
+                .queryParam("token", resetToken)
+                .build()
+                .toUriString();
         enviar(
                 email,
                 "Recuperação de senha - Sangue Amigo",

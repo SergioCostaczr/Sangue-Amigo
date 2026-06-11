@@ -39,7 +39,8 @@ $env:APP_NOTIFICATIONS_ENABLED="false"
 ```
 
 Em ambientes com notificacoes habilitadas, configure `MAIL_USERNAME` e
-`MAIL_PASSWORD`.
+`MAIL_PASSWORD`. Use `APP_FRONTEND_URL` para definir a origem dos links
+enviados por e-mail; o valor padrao local e `http://localhost:5173`.
 
 ## Funcionalidades
 
