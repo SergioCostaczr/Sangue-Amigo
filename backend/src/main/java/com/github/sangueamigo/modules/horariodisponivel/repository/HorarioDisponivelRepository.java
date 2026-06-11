@@ -15,4 +15,8 @@ public interface HorarioDisponivelRepository extends JpaRepository<HorarioDispon
     List<HorarioDisponivel> findByHemocentroIdAndDataBetween(
             Long hemocentroId, LocalDate inicio, LocalDate fim
     );
+
+    List<HorarioDisponivel> findByHemocentroIdAndDataBetweenAndDisponivelTrueOrderByDataAscHoraAsc(
+            Long hemocentroId, LocalDate inicio, LocalDate fim
+    );
 }

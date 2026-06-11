@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -116,6 +118,37 @@ public class HemocentroService {
                 .toList();
     }
 
+    public List<HorarioDisponivelResponse> listarHorariosDisponiveisPorPeriodo(
+            Long hemocentroId,
+            LocalDate inicio,
+            LocalDate fim
+    ) {
+        validarPeriodoHorarios(inicio, fim);
+
+        if (!hemocentroRepository.existsById(hemocentroId)) {
+            throw new HemocentroNaoEncontradoException();
+        }
+
+        LocalDate hoje = LocalDate.now();
+        if (fim.isBefore(hoje)) {
+            return List.of();
+        }
+
+        LocalDate inicioEfetivo = inicio.isBefore(hoje) ? hoje : inicio;
+        LocalTime agora = LocalTime.now();
+
+        return horarioDisponivelRepository
+                .findByHemocentroIdAndDataBetweenAndDisponivelTrueOrderByDataAscHoraAsc(
+                        hemocentroId,
+                        inicioEfetivo,
+                        fim
+                )
+                .stream()
+                .filter(horario -> !horario.getData().equals(hoje) || horario.getHora().isAfter(agora))
+                .map(HorarioDisponivelResponse::from)
+                .toList();
+    }
+
     private Hemocentro buscarHemocentroPorContaId(Long contaId) {
         return hemocentroRepository.findByContaId(contaId)
                 .orElseThrow(HemocentroNaoEncontradoException::new);
@@ -137,6 +170,20 @@ public class HemocentroService {
             return HorarioDisponivelResponse.from(horarioDisponivelRepository.saveAndFlush(horario));
         } catch (DataIntegrityViolationException e) {
             throw new HorarioDisponivelDuplicadoException();
+        }
+    }
+
+    private void validarPeriodoHorarios(LocalDate inicio, LocalDate fim) {
+        if (fim.isBefore(inicio)) {
+            throw new PeriodoHorariosInvalidoException(
+                    "A data final deve ser igual ou posterior a data inicial."
+            );
+        }
+
+        if (ChronoUnit.DAYS.between(inicio, fim) > 30) {
+            throw new PeriodoHorariosInvalidoException(
+                    "O periodo de consulta deve ter no maximo 30 dias."
+            );
         }
     }
 }

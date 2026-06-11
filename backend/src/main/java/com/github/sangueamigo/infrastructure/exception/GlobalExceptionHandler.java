@@ -12,9 +12,12 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -62,6 +65,19 @@ public class GlobalExceptionHandler {
                 .body(ErroResponse.of(HttpStatus.BAD_REQUEST, mensagem));
     }
 
+    @ExceptionHandler({
+            MissingServletRequestParameterException.class,
+            MethodArgumentTypeMismatchException.class
+    })
+    public ResponseEntity<ErroResponse> handleParametroInvalido(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErroResponse.of(
+                        HttpStatus.BAD_REQUEST,
+                        "Parametros da requisicao ausentes ou invalidos."
+                ));
+    }
+
     // 409 Conflict duplicidades
     @ExceptionHandler({
             EmailJaCadastradoException.class,
@@ -99,6 +115,16 @@ public class GlobalExceptionHandler {
                 .body(ErroResponse.of(HttpStatus.FORBIDDEN, ex.getMessage()));
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErroResponse> handleAcessoNegado(AccessDeniedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ErroResponse.of(
+                        HttpStatus.FORBIDDEN,
+                        "Voce nao tem permissao para acessar este recurso."
+                ));
+    }
+
     // 404 Not Found
     @ExceptionHandler({
             AgendamentoNaoEncontradoException.class,
@@ -119,6 +145,7 @@ public class GlobalExceptionHandler {
             UsuarioInaptoException.class,
             HorarioIndisponivelException.class,
             HorarioComAgendamentosAtivosException.class,
+            PeriodoHorariosInvalidoException.class,
             PeriodoCampanhaInvalidoException.class,
             IllegalStateException.class
     })
