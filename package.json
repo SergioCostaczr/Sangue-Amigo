@@ -1,0 +1,13 @@
+{
+  "name": "sangue-amigo",
+  "private": true,
+  "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1",
+    "backend:dev": "cd backend && mvnw.cmd spring-boot:run",
+    "backend:test": "cd backend && mvnw.cmd test",
+    "frontend:dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "lint": "cd frontend && npm run lint",
+    "typecheck": "cd frontend && npm run typecheck"
+  }
+}
