@@ -22,6 +22,9 @@ public class NotificacaoService {
     @Value("${spring.mail.username}")
     private String remetente;
 
+    @Value("${app.notifications.enabled:true}")
+    private boolean notificacoesHabilitadas;
+
     public void enviarBoasVindas(String email, String nome){
         enviar(
                 email,
@@ -120,6 +123,10 @@ public class NotificacaoService {
     }
 
     private void enviar(String destinatario, String assunto, String corpo){
+        if (!notificacoesHabilitadas) {
+            return;
+        }
+
         SimpleMailMessage menssagem = new SimpleMailMessage();
         menssagem.setFrom(remetente);
         menssagem.setTo(destinatario);

@@ -20,6 +20,7 @@ npm run dev
 - Backend: `http://localhost:8080`
 
 O comando `npm run dev` inicia frontend e backend em processos separados.
+No ambiente local, a API aceita o frontend por `localhost` ou `127.0.0.1`.
 
 ## Configuracao
 
@@ -30,6 +31,15 @@ VITE_API_URL=http://localhost:8080
 ```
 
 Crie `frontend/.env.local` somente quando precisar alterar o endereco padrao.
+
+Para executar localmente sem enviar e-mails:
+
+```powershell
+$env:APP_NOTIFICATIONS_ENABLED="false"
+```
+
+Em ambientes com notificacoes habilitadas, configure `MAIL_USERNAME` e
+`MAIL_PASSWORD`.
 
 ## Funcionalidades
 

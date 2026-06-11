@@ -43,7 +43,12 @@ export function LoginPage() {
       navigate(destination, { replace: true });
     } catch (error) {
       if (axios.isAxiosError<ApiError>(error)) {
-        setApiError(error.response?.data?.mensagem || "E-mail ou senha invalidos.");
+        setApiError(
+          error.response?.data?.mensagem
+          || (error.response
+            ? "E-mail ou senha invalidos."
+            : "Nao foi possivel conectar ao servidor."),
+        );
       } else {
         setApiError("Nao foi possivel entrar. Tente novamente.");
       }
