@@ -130,6 +130,7 @@ public class ContaService {
 
 
     // RF21 Recuperação de senha: passo 1
+    @Transactional
     public void solicitarRecuperacaoSenha(RecuperarSenhaRequest request){
         contaRepository.findByEmail(request.email()).ifPresent(conta -> {
             String resetToken = jwtService.gerarResetToken(conta);
